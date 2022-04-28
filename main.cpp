@@ -14,7 +14,7 @@ Binary Search Tree
 #define BLACK false
 
 using namespace std;
-void balance(node*&n);
+void balance(node* &n, node* &root);
 
 void add(int num, node* &root, node* &r, node* last) { // add numbers
 	if (r == NULL) {
@@ -52,7 +52,7 @@ void balance (node* &n, node* &root) {
 			n->parent->rob = BLACK;
 			uncle->rob = BLACK;
 			n->parent->parent->rob = RED;
-			balance(n->parent->parent);
+			balance(n->parent->parent, root);
 		}
 		if (uncle->rob == BLACK) { //(case 4 and 5)
 			if (n->parent == n->parent->parent->left && n == n->parent->right) { // case 4 rotate left
