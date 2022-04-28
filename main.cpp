@@ -16,7 +16,7 @@ Binary Search Tree
 using namespace std;
 void balance(node*&n);
 
-void add(int num, node* &r, node* last) { // add numbers
+void add(int num, node* &root, node* &r, node* last) { // add numbers
 	if (r == NULL) {
 		r = new node(num);
 		r->rob = RED;
@@ -24,18 +24,18 @@ void add(int num, node* &r, node* last) { // add numbers
 		if (r->parent != NULL) {
 			cout << r->parent->data << endl;
 		}
-		balance(r);
+		balance(r, root);
 	}
 	else if (num < r->data) {
-		add(num, r->left, r);
+		add(num, root, r->left, r);
 		return;
 	}
 	else if (num > r->data) {
-		add(num, r->right, r);
+		add(num, root, r->right, r);
 		return;
 	}
 }
-void balance (node* &n) {
+void balance (node* &n, node* &root) {
 	// case2 defaults
 	// get uncle (case 3)
 	node* uncle = NULL;
@@ -61,21 +61,58 @@ void balance (node* &n) {
 				temp->right = n->left;
 				n->left = temp;
 				//fix parents
-				n->parent = p->parent;
+				n->parent = n->parent->parent;
 				n->left->parent = n;
 				n->left->right->parent = n->left;
+				balance(n->left, root); // case5 parent
 			}
-			else if (n->parent == n->parent->parent->right && n == n->parent->left) // case 4 rotate right
+			else if (n->parent == n->parent->parent->right && n == n->parent->left) { // case 4 rotate right
 				node* temp = n->parent;
 				n->parent->parent->right = n;
 				temp->left = n->right;
 				n->right = temp;
 				//fix parents
-				n->parent = p->parent;
+				n->parent = n->parent->parent;
 				n->right->parent = n;
 				n->right->left->parent = n->right;
+				balance(n->right, root); //case 5 parent
 			}
-			//call case 5 on parent? 
+			if (n->parent == n->parent->parent->left && n == n->parent->left) { // case 5 rotate left
+				node* temp = n->parent->right;
+				n->parent->right = n->parent->parent;
+				if (n->parent->parent->parent->left == n->parent->parent) {
+					n->parent->parent->parent->left = n->parent;
+				}
+				else if (n->parent->parent->parent->right == n->parent->parent) {
+					n->parent->parent->parent->right = n->parent;
+				}
+				n->parent->right->left = temp;
+				//fix parents
+				n->parent->parent = n->parent->parent->parent;
+				n->parent->right->parent = n->parent;
+				n->parent->right->left->parent = n->parent->right;
+				//swap colors
+				n->parent->rob = !(n->parent->rob);
+				n->parent->right->rob = !(n->parent->right->rob);
+			}
+			else if (n->parent == n->parent->parent->right && n == n->parent->right) { // case 5 rotate right
+				node* temp = n->parent->left;
+				n->parent->left = n->parent->parent;
+				if (n->parent->parent->parent->left == n->parent->parent) {
+					n->parent->parent->parent->left = n->parent;
+				}
+				else if (n->parent->parent->parent->right == n->parent->parent) {
+					n->parent->parent->parent->right = n->parent;
+				}
+				n->parent->left->right = temp;
+				//fix parents
+				n->parent->parent = n->parent->parent->parent;
+				n->parent->left->parent = n->parent;
+				n->parent->left->right->parent = n->parent->left;
+				//swap colors
+				n->parent->rob = !(n->parent->rob);
+				n->parent->left->rob = !(n->parent->left->rob);
+			}
 		}
 	}
 	
@@ -130,7 +167,7 @@ int main() {
 			int number = 0;
 			cin >> number;
 			if (number != 0) {
-				add(number, root, NULL);
+				add(number, root, root, NULL);
 			}
 		}
 		else if (strcmp(input, "READ") == 0) { // Read in numbers
@@ -148,7 +185,7 @@ int main() {
 				int number = 0;
 				while (iFile >> number) {
 					if (number != 0) {
-						add(number, root, NULL); //add number
+						add(number, root, root, NULL); //add number
 					}
 				}
 			}
