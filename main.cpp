@@ -15,6 +15,7 @@ Binary Search Tree
 
 using namespace std;
 void balance(node* n, node* &root);
+void print(node* r, int level);
 
 void add(int num, node* &root, node* &r, node* last) { // add numbers
 	if (r == NULL) {
@@ -79,7 +80,9 @@ void balance (node* n, node* &root) {
 			if (n->left->right != NULL) {
 				n->left->right->parent = n->left;
 			}
+			print(root, 0);
 			balance(n->left, root); // case5 parent
+			return;
 		}
 		else if (n->parent == n->parent->parent->right && n == n->parent->left && n->parent->rob == RED) { // case 4 rotate right
 			cout << "case 4 rotate right" << endl;
@@ -94,24 +97,38 @@ void balance (node* n, node* &root) {
 				n->right->left->parent = n->right;
 			}
 			balance(n->right, root); //case 5 parent
+			return;
 		}
 		if (n->parent == n->parent->parent->left && n == n->parent->left && n->parent->rob == RED) { // case 5 rotate left
 			cout << "case 5 rotate left" << endl;
 			node* temp = n->parent->right;
 			n->parent->right = n->parent->parent;
-			if (n->parent->parent->parent->left == n->parent->parent) { // fix 3 long tree 3, 1, 2 break
-				n->parent->parent->parent->left = n->parent;
+			if (n->parent->parent->parent != NULL) {
+				if (n->parent->parent->parent->left == n->parent->parent) { // fix 3 long tree 3, 1, 2 break
+					n->parent->parent->parent->left = n->parent;
+				}
+				else if (n->parent->parent->parent->right == n->parent->parent) {
+					n->parent->parent->parent->right = n->parent;
+				}
 			}
-			else if (n->parent->parent->parent->right == n->parent->parent) {
-				n->parent->parent->parent->right = n->parent;
+			else {
+				root = n->parent;
 			}
 			n->parent->right->left = temp;
 			cout << "fix parents" << endl;
 			//fix parents
-			n->parent->parent = n->parent->parent->parent;
+			if (temp != NULL) {
+				temp->parent = n->parent->right;
+			}
+			if (root != n->parent) {
+				n->parent->parent = n->parent->right->parent;
+			}
+			else {
+				n->parent->parent = NULL;
+			}
 			n->parent->right->parent = n->parent;
-			n->parent->right->left->parent = n->parent->right;
 			//swap colors
+			cout << "swap colors" << endl;
 			n->parent->rob = !(n->parent->rob);
 			n->parent->right->rob = !(n->parent->right->rob);
 		}
@@ -119,17 +136,29 @@ void balance (node* n, node* &root) {
 			cout << "case 5 rotate right" << endl;
 			node* temp = n->parent->left;
 			n->parent->left = n->parent->parent;
-			if (n->parent->parent->parent->left == n->parent->parent) {
-				n->parent->parent->parent->left = n->parent;
+			if (n->parent->parent->parent != NULL) {
+				if (n->parent->parent->parent->left == n->parent->parent) {
+					n->parent->parent->parent->left = n->parent;
+				}
+				else if (n->parent->parent->parent->right == n->parent->parent) {
+					n->parent->parent->parent->right = n->parent;
+				}
 			}
-			else if (n->parent->parent->parent->right == n->parent->parent) {
-				n->parent->parent->parent->right = n->parent;
+			else {
+				root = n->parent;
 			}
 			n->parent->left->right = temp;
 			//fix parents
-			n->parent->parent = n->parent->parent->parent;
+			if (temp != NULL) {
+				temp->parent = n->parent->left;
+			}
+			if (root != n->parent) {
+				n->parent->parent = n->parent->left->parent;
+			}
+			else {
+				n->parent->parent = NULL;
+			}
 			n->parent->left->parent = n->parent;
-			n->parent->left->right->parent = n->parent->left;
 			//swap colors
 			n->parent->rob = !(n->parent->rob);
 			n->parent->left->rob = !(n->parent->left->rob);
@@ -141,7 +170,6 @@ void balance (node* n, node* &root) {
 	node* p = n;
 	while (p->parent != NULL) {
 		p = p->parent;
-		//check double reds and black pushes
 	}
 	if (p->rob == RED && p->parent == NULL) { // case1
 		p->rob = BLACK;
