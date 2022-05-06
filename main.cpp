@@ -5,15 +5,16 @@
 
 #if 0
 Justin Iness
-4/20/2022
+5/6/2022
 C++ Programming
-Binary Search Tree
+Red Black Tree
 #endif
 
 #define RED true
 #define BLACK false
 
 using namespace std;
+//declare
 void balance(node* n, node* &root);
 void print(node* r, int level);
 
@@ -41,7 +42,6 @@ void balance (node* n, node* &root) { // balance on node
 	if (n->parent != NULL && n->parent->parent != NULL) { // if uncle	
 		hasUncle = true;
 		if (n->parent->parent->left != NULL && n->parent->parent->right != NULL) { //not null uncle
-			cout << "has not null uncle" << endl;
 			if (n->parent == n->parent->parent->left) { // right of gp is uncle
 				uncle = n->parent->parent->right;
 			}
@@ -49,7 +49,6 @@ void balance (node* n, node* &root) { // balance on node
 				uncle = n->parent->parent->left;
 			}
 			if (uncle->rob == RED && n->parent->rob == RED) { // case 3
-				cout << "push blackness" << endl;
 				n->parent->rob = BLACK;
 				uncle->rob = BLACK;
 				n->parent->parent->rob = RED;
