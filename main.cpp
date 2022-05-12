@@ -185,13 +185,66 @@ void print(node* r, int level) { // print tree visually
 	// left
 	print(r->left, level);
 }
+void search(int num, node* r) {
+	if (r == NULL) { // not in tree
+		cout << num << " not in tree." << endl;
+		return;
+	}
+	else if (r->data == num) { // in tree
+		cout << num << " is in tree." << endl;
+		return;
+	}
+	else if (num < r->data) { // search left
+		search(num, r->left);
+	}
+	else if (num > r->data) { // search right
+		search(num, r->right);
+	}
+}
+void del(int num, node* &r) {
+	if (r == NULL) { // not in tree
+                cout << num << " not in tree." << endl;
+                return;
+        }
+        else if (r->data == num) { // in tree
+                cout << num << " is in tree. Deleting" << endl;
+		if (r->left == NULL || r->right == NULL) { // 1 long or 1 child lists
+			if (r->left == NULL && r->right == NULL) { // 1 long list
+				r = NULL; // del root  SC #1
+			}
+			else { // one child lists
+				if (r->left != NULL) { // left child
+					r = r->left;
+				}
+				else if (r->right != NULL) { // right child
+					r = r->right;
+				}
+			}
+		}
+		else { // list with 2 children
+			 node* prevInList = r->left;
+			 while (prevInList->right != NULL) {
+				 prevInList = prevInList->right;
+			 }
+			 r->data = prevInList->data;
+			 del(prevInList->data, r->left);
+		}
+                return;
+        }
+        else if (num < r->data) { // search left
+                del(num, r->left);
+        }
+        else if (num > r->data) { // search right
+                del(num, r->right);
+        }
+}
 
 int main() {
 	//create new root bst
 	node* root = NULL;
 	char input[5000];
 	while (true) {
-		cout << "Enter a command (ADD), (READ), (PRINT) or (QUIT): " << endl;
+		cout << "Enter a command (ADD), (READ), (PRINT), (SEARCH), (DELETE), or (QUIT): " << endl;
 		cin >> input;
 		if (strcmp(input, "ADD") == 0) { // Add number
 			cout << "Enter a number to add: " << endl;
@@ -223,6 +276,22 @@ int main() {
 		}
 		else if (strcmp(input, "PRINT") == 0) { // Print number
 			print(root, 0);
+		}
+		else if (strcmp(input, "SEARCH") == 0) { // Search number
+                        cout << "Enter a number to search for: " << endl;
+			int number = 0;
+			cin >> number;
+			if (number != 0) {
+				search(number, root);
+			}
+                }	
+		else if (strcmp(input, "DELETE") == 0) { // Delete number
+			cout << "Enter a number to delete: " << endl;
+                        int number = 0;
+                        cin >> number;
+                        if (number != 0) {
+                                del(number, root);
+                        }		
 		}
 		else if (strcmp(input, "QUIT") == 0) { // Quit program
 			return 0;
