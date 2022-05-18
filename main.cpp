@@ -208,19 +208,7 @@ void del(int num, node* &r) {
         }
         else if (r->data == num) { // in tree
                 cout << num << " is in tree. Deleting" << endl;
-		if (r->left == NULL || r->right == NULL) { // 1 long or 1 child lists
-			if (r->left == NULL && r->right == NULL) { // 1 long list
-				r = NULL; // del root  SC #1
-			}
-			else { // one child lists
-				if (r->left != NULL) { // left child
-					r = r->left;
-				}
-				else if (r->right != NULL) { // right child
-					r = r->right;
-				}
-			}
-		}
+		if (r->rob == RED && (r->
 		else { // list with 2 children
 			 node* prevInList = r->left;
 			 while (prevInList->right != NULL) {
