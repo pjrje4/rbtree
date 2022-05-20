@@ -17,6 +17,7 @@ using namespace std;
 //declare
 void balance(node* n, node* &root);
 void print(node* r, int level);
+void delbal(node* r, node* &root);
 
 void add(int num, node* &root, node* &r, node* last) { // add numbers
 	if (r == NULL) { // insert here
@@ -201,30 +202,77 @@ void search(int num, node* r) {
 		search(num, r->right);
 	}
 }
-void del(int num, node* &r) {
+void del(int num, node* &r, node* &root) {
 	if (r == NULL) { // not in tree
                 cout << num << " not in tree." << endl;
                 return;
         }
         else if (r->data == num) { // in tree
-                cout << num << " is in tree. Deleting" << endl;
-		if (r->rob == RED && (r->
+		cout << num << " is in tree. Deleting" << endl;
+		if (r->left == NULL || r->right == NULL) { // 1 long or 1 child lists
+			bool m = RED;
+			bool c = RED;
+			if (r->left == NULL && r->right == NULL) { // 1 long list
+				m = r->rob;
+				c = BLACK;
+				r = NULL; // del root
+			}
+			else { // one child lists
+				if (r->left != NULL) { // left child
+					m = r->rob;
+					c = r->left->rob;
+
+					r->left->parent = r->parent;
+					r = r->left;
+				}
+				else if (r->right != NULL) { // right child
+					m = r->rob;
+					c = r->right->rob;
+
+					r->right->parent = r->parent;
+					r = r->right;
+				}
+			}
+			if (m == RED && c == BLACK) {
+				return;
+			}
+			else if (m == BLACK && c == RED) {
+				r->rob = BLACK;
+			}
+			else if (m == BLACK && c == BLACK) {
+				delbal(r, root);
+			}
+
+
+		}
 		else { // list with 2 children
 			 node* prevInList = r->left;
 			 while (prevInList->right != NULL) {
 				 prevInList = prevInList->right;
 			 }
 			 r->data = prevInList->data;
-			 del(prevInList->data, r->left);
+			 del(prevInList->data, r->left, root);
 		}
                 return;
         }
         else if (num < r->data) { // search left
-                del(num, r->left);
+                del(num, r->left, root);
         }
         else if (num > r->data) { // search right
-                del(num, r->right);
+                del(num, r->right, root);
         }
+}
+void delbal(node* r, node* &root) {
+	if (r->parent != NULL) { // case 2
+		if (r->parent->left == r) { // search right
+			if (r->parent->right->rob == RED) {
+				//case 2
+			}
+		}
+		else if (r->parent->right == r) {
+			if (r->parent->left->rob == RED) {
+
+	if (n->parent == n->parent->parent->left	
 }
 
 int main() {
@@ -278,7 +326,7 @@ int main() {
                         int number = 0;
                         cin >> number;
                         if (number != 0) {
-                                del(number, root);
+                                del(number, root, root);
                         }		
 		}
 		else if (strcmp(input, "QUIT") == 0) { // Quit program
