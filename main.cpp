@@ -263,16 +263,84 @@ void del(int num, node* &r, node* &root) {
         }
 }
 void delbal(node* r, node* &root) {
-	if (r->parent != NULL) { // case 2
-		if (r->parent->left == r) { // search right
-			if (r->parent->right->rob == RED) {
-				//case 2
+	if (r->parent != NULL) { // case 2, 3
+		if (r->parent->left == r) { // case 2, 3 left
+			if (r->parent->right->rob == RED) { // case 2 left
+                                node* temp = r->parent->right->left;
+                                r->parent->right->left = r->parent;
+                                r->parent->right = temp;
+
+                                if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
+                                        if (r->parent->parent->left == r->parent) {
+                                                r->parent->parent->left = r->parent->left->parent;
+                                                r->parent->parent->left->parent = r->parent->parent;
+
+                                        }
+                                        else if (r->parent->parent->right == r->parent) {
+                                                r->parent->parent->right = r->parent->right->parent;
+                                                r->parent->parent->right->parent = r->parent->parent;
+
+
+                                        }
+                                }
+                                else {
+                                        root = r->parent->right->parent;
+                                }
+
+                                //fix parents
+                                r->parent->right->parent = r->parent;
+                                r->parent->parent = r->parent->parent->right;
+           			//swap P and S
+				r->parent->rob = !(r->parent->rob);
+				r->parent->parent->rob = !(r->parent->parent->rob);
+				//call case 3
+				delbal(r, root);
+				return;
+			}
+			else if (r->parent->right->rob == BLACK) { // case 3 right
+				r->parent->right->rob == RED;
+				delbal(r->parent, root);
 			}
 		}
-		else if (r->parent->right == r) {
-			if (r->parent->left->rob == RED) {
+		else if (r->parent->right == r) { // case 2, 3 right
+			if (r->parent->left->rob == RED) { // case 2 right
+				node* temp = r->parent->left->right;
+				r->parent->left->right = r->parent;
+				r->parent->left = temp;
 
-	if (n->parent == n->parent->parent->left	
+				if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
+                        	        if (r->parent->parent->left == r->parent) {
+                                	        r->parent->parent->left = r->parent->left->parent;
+						r->parent->parent->left->parent = r->parent->parent;
+
+                              		}
+                              		else if (r->parent->parent->right == r->parent) {
+                              	        	r->parent->parent->right = r->parent->right->parent;
+						r->parent->parent->right->parent = r->parent->parent;
+
+
+                                	}
+	                        }
+        	                else {
+                	                root = r->parent->left->parent;
+                       	 	}
+
+				//fix parents
+				r->parent->left->parent = r->parent;
+				r->parent->parent = r->parent->parent->left;
+           			//swap P and S
+				r->parent->rob = !(r->parent->rob);
+				r->parent->parent->rob = !(r->parent->parent->rob);
+				//call case 3
+				delbal(r, root);
+				return;
+			}
+			else if (r->parent->left->rob == BLACK) { // case 3 left
+				r->parent->left->rob == RED;
+				delbal(r->parent, root);
+			}
+		}
+	}
 }
 
 int main() {
