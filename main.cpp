@@ -298,9 +298,10 @@ void delbal(node* r, node* &root) {
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 			}
-			else if (r->parent->right->rob == BLACK) { // case 3 right
+			if (r->parent->right->rob == BLACK && (r->parent->right->left == NULL || r->parent->right->left->rob == BLACK) && (r->parent->right->right == NULL || r->parent->right->right->rob == BLACK)) { // case 3 right
 				cout << "Case 3 left" << endl;
-				r->parent->right->rob == RED;
+				r->parent->right->rob = RED;
+				delbal(r->parent, root);
 			}
 			//case 4
 			if (r->parent->rob == RED && r->parent->right->rob == BLACK && (r->parent->right->left == NULL || r->parent->right->left->rob == BLACK) && (r->parent->right->right == NULL || r->parent->right->right->rob == BLACK)) {
@@ -317,13 +318,14 @@ void delbal(node* r, node* &root) {
 				r->parent->right = r->parent->right->left;
 				r->parent->right->right->left = temp;
 				//fix parents
-				r->parent->right->right->left->parent = r->parent->right->right;
+				if (temp != NULL) {
+					r->parent->right->right->left->parent = r->parent->right->right;
+				}
 				r->parent->right->right->parent = r->parent->right;
 				r->parent->right->parent = r->parent;
 				//colors
 				r->parent->right->rob = BLACK;
 				r->parent->right->right->rob = RED;
-				return;
 			}
 			//case 6
                         if (r->parent->right->rob == BLACK && (r->parent->right->right != NULL && r->parent->right->right->rob == RED)) {
@@ -395,9 +397,10 @@ void delbal(node* r, node* &root) {
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 			} // end case 2
-			else if (r->parent->left->rob == BLACK) { // case 3 left
+			if (r->parent->left->rob == BLACK && (r->parent->left->right == NULL || r->parent->left->right->rob == BLACK) && (r->parent->left->left == NULL || r->parent->left->left->rob == BLACK)) { // case 3 right
 				cout << "Case 3 right" << endl;
-				r->parent->left->rob == RED;
+				r->parent->left->rob = RED;
+				delbal(r->parent, root);
 			}
 			//case 4
 			if (r->parent->rob == RED && r->parent->left->rob == BLACK && (r->parent->left->left == NULL || r->parent->left->left->rob == BLACK) && (r->parent->left->right == NULL || r->parent->left->right->rob == BLACK)) {
@@ -414,13 +417,14 @@ void delbal(node* r, node* &root) {
 				r->parent->left = r->parent->left->right;
 				r->parent->left->left->right = temp;
 				//fix parents
-				r->parent->left->left->right->parent = r->parent->left->left;
+				if (temp != NULL) { 
+					r->parent->left->left->right->parent = r->parent->left->left;
+				}
 				r->parent->left->left->parent = r->parent->left;
 				r->parent->left->parent = r->parent;
 				//colors
 				r->parent->left->rob = BLACK;
 				r->parent->left->left->rob = RED;
-				return;
 			}
 			//case 6
 			if (r->parent->left->rob == BLACK && (r->parent->left->left != NULL && r->parent->left->left->rob == RED)) {
