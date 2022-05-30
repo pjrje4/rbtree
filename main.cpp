@@ -215,7 +215,7 @@ void del(int num, node* &r, node* &root) {
 			if (r->left == NULL && r->right == NULL) { // 1 long list
 				m = r->rob;
 				c = BLACK;
-				r = NULL; // del root
+				r->data = 0; // will del root
 			}
 			else { // one child lists
 				if (r->left != NULL) { // left child
@@ -234,7 +234,6 @@ void del(int num, node* &r, node* &root) {
 				}
 			}
 			if (m == RED && c == BLACK) {
-				return;
 			}
 			else if (m == BLACK && c == RED) {
 				r->rob = BLACK;
@@ -242,8 +241,9 @@ void del(int num, node* &r, node* &root) {
 			else if (m == BLACK && c == BLACK) {
 				delbal(r, root);
 			}
-
-
+			if (r->data == 0) {
+				r = NULL;
+			}
 		}
 		else { // list with 2 children
 			 node* prevInList = r->left;
@@ -267,42 +267,46 @@ void delbal(node* r, node* &root) {
 		if (r->parent->left == r) { // case 2, 3 left
 			if (r->parent->right->rob == RED) { // case 2 left
                                 node* temp = r->parent->right->left;
+				node* sibling = r->parent->right;
                                 r->parent->right->left = r->parent;
                                 r->parent->right = temp;
 
                                 if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
                                         if (r->parent->parent->left == r->parent) {
-                                                r->parent->parent->left = r->parent->right->parent;
+                                                r->parent->parent->left = sibling;
                                                 r->parent->parent->left->parent = r->parent->parent;
 
                                         }
                                         else if (r->parent->parent->right == r->parent) {
-                                                r->parent->parent->right = r->parent->left->parent;
+                                                r->parent->parent->right = sibling;
                                                 r->parent->parent->right->parent = r->parent->parent;
 
 
                                         }
                                 }
                                 else {
-                                        root = r->parent->right->parent;
+                                        root = sibling;
                                 }
 
                                 //fix parents
-                                r->parent->right->parent = r->parent;
-                                r->parent->parent = r->parent->parent->right;
+				if (temp != NULL) {
+                                	r->parent->right->parent = r->parent;
+				}
+                                r->parent->parent = sibling;
            			//swap P and S
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 				//call case 3
-				delbal(r, root);
+				if (r->parent->right->rob == BLACK) { // case 3 right
+                                	r->parent->right->rob == RED;
+				}
 				return;
 			}
 			else if (r->parent->right->rob == BLACK) { // case 3 right
 				r->parent->right->rob == RED;
-				delbal(r->parent, root);
 			}
 			//case 4
-			if (r->parent->rob == RED && r->parent->right->rob == BLACK && r->parent->right->left->rob == BLACK && r->parent->right->right->rob == BLACK) {
+			if (r->parent->rob == RED && r->parent->right->rob == BLACK && (r->parent->right->left == NULL || r->parent->right->left->rob == BLACK) && (r->parent->right->right == NULL || r->parent->right->right->rob == BLACK)) {
 				r->parent->rob = BLACK;
 				r->parent->right->rob = BLACK;
 				return;
@@ -325,73 +329,81 @@ void delbal(node* r, node* &root) {
 			//case 6
                         if (r->parent->right->rob == BLACK && r->parent->right->right->rob == RED) {
                                 node* temp = r->parent->right->left;
+				node* sibling = r->parent->right;
                                 r->parent->right->left = r->parent;
                                 r->parent->right = temp;
 
                                 if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
                                         if (r->parent->parent->left == r->parent) {
-                                                r->parent->parent->left = r->parent->right->parent;
+                                                r->parent->parent->left = sibling;
                                                 r->parent->parent->left->parent = r->parent->parent;
 
                                         }
                                         else if (r->parent->parent->right == r->parent) {
-                                                r->parent->parent->right = r->parent->left->parent;
+                                                r->parent->parent->right = sibling;
                                                 r->parent->parent->right->parent = r->parent->parent;
 
 
                                         }
                                 }
                                 else { // else change root
-                                        root = r->parent->right->parent;
+                                       	root = sibling;
                                 }
                                 //fix parents
-                                r->parent->right->parent = r->parent;
-                                r->parent->parent = r->parent->parent->right;
+				if (temp != NULL) {
+                                	r->parent->right->parent = r->parent;
+				}
+                                r->parent->parent = sibling;
                                 //colors
                                 r->parent->parent->rob = r->parent->rob;
                                 r->parent->rob = BLACK;
+				sibling->right->rob = BLACK;
                         }
 
 		}
 		else if (r->parent->right == r) { // right
 			if (r->parent->left->rob == RED) { // right, sibling is red, case 2
 				node* temp = r->parent->left->right;
+				node* sibling = r->parent->left;
 				r->parent->left->right = r->parent;
 				r->parent->left = temp;
 
 				if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
                         	        if (r->parent->parent->left == r->parent) {
-                                	        r->parent->parent->left = r->parent->left->parent;
+                                	        r->parent->parent->left = sibling;
 						r->parent->parent->left->parent = r->parent->parent;
 
                               		}
                               		else if (r->parent->parent->right == r->parent) {
-                              	        	r->parent->parent->right = r->parent->right->parent;
+                              	        	r->parent->parent->right = sibling;
 						r->parent->parent->right->parent = r->parent->parent;
 
 
                                 	}
 	                        }
         	                else { // else change root
-                	                root = r->parent->left->parent;
+                	                root = sibling;
                        	 	}
 
 				//fix parents
-				r->parent->left->parent = r->parent;
-				r->parent->parent = r->parent->parent->left;
+				if (temp != NULL) {
+					r->parent->left->parent = r->parent;
+				}
+				r->parent->parent = sibling;
            			//swap P and S
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 				//call case 3
-				delbal(r, root);
+				if (r->parent->left->rob == BLACK) { // case 3 left
+                                	r->parent->left->rob == RED;
+                        	}
 				return;
 			} // end case 2
 			else if (r->parent->left->rob == BLACK) { // case 3 left
 				r->parent->left->rob == RED;
-				delbal(r->parent, root);
 			}
 			//case 4
-			if (r->parent->rob == RED && r->parent->left->rob == BLACK && r->parent->left->left->rob == BLACK && r->parent->left->right->rob == BLACK) {
+			if (r->parent->rob == RED && r->parent->left->rob == BLACK && (r->parent->left->left == NULL || r->parent->left->left->rob == BLACK) && (r->parent->left->right == NULL || r->parent->left->right->rob == BLACK)) {
 				r->parent->rob = BLACK;
 				r->parent->left->rob = BLACK;
 				return;
@@ -400,7 +412,7 @@ void delbal(node* r, node* &root) {
 			if (r->parent->left->rob == BLACK && r->parent->left->left->rob == BLACK && r->parent->left->right->rob == RED) {
 				node* temp = r->parent->left->right->left;
 				r->parent->left->right->left = r->parent->left;
-				r->parent->left = r->p->left->right;
+				r->parent->left = r->parent->left->right;
 				r->parent->left->left->right = temp;
 				//fix parents
 				r->parent->left->left->right->parent = r->parent->left->left;
@@ -414,31 +426,35 @@ void delbal(node* r, node* &root) {
 			//case 6
 			if (r->parent->left->rob == BLACK && r->parent->left->left->rob == RED) {
 				node* temp = r->parent->left->right;
+				node* sibling = r->parent->left;
                                 r->parent->left->right = r->parent;
                                 r->parent->left = temp;
 
                                 if (r->parent->parent != NULL) { // grandparents (DONT CHANGE)
                                         if (r->parent->parent->left == r->parent) {
-                                                r->parent->parent->left = r->parent->left->parent;
+                                                r->parent->parent->left = sibling;
                                                 r->parent->parent->left->parent = r->parent->parent;
 
                                         }
                                         else if (r->parent->parent->right == r->parent) {
-                                                r->parent->parent->right = r->parent->right->parent;
+                                                r->parent->parent->right = sibling;
                                                 r->parent->parent->right->parent = r->parent->parent;
 
 
                                         }
                                 }
                                 else { // else change root
-                                        root = r->parent->left->parent;
+                                        root = sibling;
                                 }
 				//fix parents
-                                r->parent->left->parent = r->parent;
-                                r->parent->parent = r->parent->parent->left;
+				if (temp != NULL) {
+                                	r->parent->left->parent = r->parent;
+				}
+                                r->parent->parent = sibling;
 				//colors
 				r->parent->parent->rob = r->parent->rob;
 				r->parent->rob = BLACK;
+				sibling->left->rob = BLACK;
 			}
 		}
 	}
