@@ -18,6 +18,7 @@ using namespace std;
 void balance(node* n, node* &root);
 void print(node* r, int level);
 void delbal(node* r, node* &root);
+void checkparents(node* r);
 
 void add(int num, node* &root, node* &r, node* last) { // add numbers
 	if (r == NULL) { // insert here
@@ -208,6 +209,7 @@ void del(int num, node* &r, node* &root) {
                 return;
         }
         else if (r->data == num) { // in tree
+		//checkparents(root);
 		cout << num << " is in tree. Deleting" << endl;
 		if (r->left == NULL || r->right == NULL) { // 1 long or 1 child lists
 			bool m = RED;
@@ -215,13 +217,13 @@ void del(int num, node* &r, node* &root) {
 			if (r->left == NULL && r->right == NULL) { // 1 long list
 				m = r->rob;
 				c = BLACK;
-				r->data = 0; // will del root
+				r->data = 0;
 			}
 			else { // one child lists
 				if (r->left != NULL) { // left child
 					m = r->rob;
 					c = r->left->rob;
-
+					
 					r->left->parent = r->parent;
 					r = r->left;
 				}
@@ -253,6 +255,7 @@ void del(int num, node* &r, node* &root) {
 			 r->data = prevInList->data;
 			 del(prevInList->data, r->left, root);
 		}
+		//checkparents(root);
                 return;
         }
         else if (num < r->data) { // search left
@@ -266,7 +269,7 @@ void delbal(node* r, node* &root) {
 	if (r->parent != NULL) { // case 2, 3
 		if (r->parent->left == r) { // case 2, 3 left
 			if (r->parent->right->rob == RED) { // case 2 left
-				cout << "Case 3 left" << endl;
+				cout << "Case 2 left" << endl;
                                 node* temp = r->parent->right->left;
 				node* sibling = r->parent->right;
                                 r->parent->right->left = r->parent;
@@ -287,6 +290,7 @@ void delbal(node* r, node* &root) {
                                 }
                                 else {
                                         root = sibling;
+					sibling->parent = NULL;
                                 }
 
                                 //fix parents
@@ -298,8 +302,8 @@ void delbal(node* r, node* &root) {
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 			}
-			if (r->parent->right->rob == BLACK && (r->parent->right->left == NULL || r->parent->right->left->rob == BLACK) && (r->parent->right->right == NULL || r->parent->right->right->rob == BLACK)) { // case 3 right
-				cout << "Case 3 left" << endl;
+			if (r->parent->rob == BLACK && r->parent->right->rob == BLACK && (r->parent->right->left == NULL || r->parent->right->left->rob == BLACK) && (r->parent->right->right == NULL || r->parent->right->right->rob == BLACK)) { // case 3 right
+				cout << "Case 3 left on "<< r->data << endl;
 				r->parent->right->rob = RED;
 				delbal(r->parent, root);
 			}
@@ -350,6 +354,7 @@ void delbal(node* r, node* &root) {
                                 }
                                 else { // else change root
                                        	root = sibling;
+					sibling->parent = NULL;
                                 }
                                 //fix parents
 				if (temp != NULL) {
@@ -386,6 +391,7 @@ void delbal(node* r, node* &root) {
 	                        }
         	                else { // else change root
                 	                root = sibling;
+					sibling->parent = NULL;
                        	 	}
 
 				//fix parents
@@ -397,8 +403,9 @@ void delbal(node* r, node* &root) {
 				r->parent->rob = !(r->parent->rob);
 				r->parent->parent->rob = !(r->parent->parent->rob);
 			} // end case 2
-			if (r->parent->left->rob == BLACK && (r->parent->left->right == NULL || r->parent->left->right->rob == BLACK) && (r->parent->left->left == NULL || r->parent->left->left->rob == BLACK)) { // case 3 right
-				cout << "Case 3 right" << endl;
+			if (r->parent->rob == BLACK && r->parent->left->rob == BLACK && (r->parent->left->right == NULL || r->parent->left->right->rob == BLACK) && (r->parent->left->left == NULL || r->parent->left->left->rob == BLACK)) { // case 3 right
+				cout << "Case 3 right on " << r->data << endl;
+				
 				r->parent->left->rob = RED;
 				delbal(r->parent, root);
 			}
@@ -449,6 +456,7 @@ void delbal(node* r, node* &root) {
                                 }
                                 else { // else change root
                                         root = sibling;
+					sibling->parent = NULL;
                                 }
 				//fix parents
 				if (temp != NULL) {
@@ -462,6 +470,38 @@ void delbal(node* r, node* &root) {
 			}
 		}
 	}
+}
+void checkparents(node* r) { // output all parents and left right for debug
+	cout << r->data;
+	cout << "|";
+	if (r->parent != NULL) {
+		cout << "P: " << r->parent->data;
+	}
+	else {
+		cout << "P: NULL";
+	}
+	cout << "|";
+	if (r->left != NULL) {
+		cout << "L: " << r->left->data;
+	}
+	else {
+		cout << "L: NULL";
+	}
+	cout << "|";
+	if (r->right != NULL) {
+		cout << "R: " << r->right->data;
+	}
+	else {
+		cout << "R: NULL";
+	}
+	cout << endl;
+	if (r->left != NULL) {
+		checkparents(r->left);
+	}
+	if (r->right != NULL) {
+		checkparents(r->right);
+	}
+	return;
 }
 
 int main() {
